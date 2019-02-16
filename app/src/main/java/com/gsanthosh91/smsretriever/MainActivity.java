@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
@@ -18,19 +19,27 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.List;
 
+import me.philio.pinentry.PinEntryView;
+
 import static com.gsanthosh91.smsretriever.MySMSBroadcastReceiver.INTENT_OTP;
 
 public class MainActivity extends AppCompatActivity {
 
     private String TAG = "MySMS";
+    PinEntryView pinview;
+    TextView note;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        pinview = (PinEntryView) findViewById(R.id.pin_entry);
+        note = findViewById(R.id.note);
         List<String> list = new AppSignatureHelper(this).getAppSignatures();
         Log.d(TAG, "HASH " + list.toString());
+
+        note.setText("HASH: " + list.toString());
 
         SmsRetrieverClient client = SmsRetriever.getClient(this);
         Task<Void> task = client.startSmsRetriever();
@@ -56,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             if (intent.getAction().equalsIgnoreCase(INTENT_OTP)) {
                 final String message = intent.getStringExtra("otp");
                 Log.d(TAG, "OTP" + message);
+                pinview.setText(message);
             }
         }
     };
